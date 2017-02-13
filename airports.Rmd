@@ -1,0 +1,56 @@
+---
+title: "Airport Coordinates"
+author: "Rodrigo Suzuki Okada"
+date: "2/13/2017"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Dataset
+
+This web presentation features a map of airports around the world, created with Leaflet in R.
+
+```{r, echo=FALSE, eval=TRUE}
+library(leaflet)
+```
+
+The dataset itself is available [here](http://www.chocolatesoftware.com/forum/index.php?topic=839.0). It consists of a list of airports by ICAO code, latitude, longitude and altitude (in feet).
+
+```{r, echo=TRUE, eval=TRUE}
+airports <- read.csv("icao_airports.csv", 
+                     col.names = c("code", "lat", "lng", "alt"))
+head(airports)
+```
+
+## Preparing the map
+
+Each marker on the map will be presented with a airplane icon. The [original file](https://commons.wikimedia.org/wiki/Category:Aircraft_icons)
+is available on Wikimedia Commons.
+
+```{r, echo=TRUE, eval=TRUE}
+airplaneIcon <- makeIcon(iconUrl = "airplane_icon.png", 
+                         iconWidth = 32, iconHeight = 32, 
+                         iconAnchorX = 16, iconAnchorY = 16)
+```
+
+The markers will have popup information with the airport's code and coordinates.
+
+```{r, echo=TRUE, eval=TRUE}
+airports$legend <- paste(airports$code, 
+                         paste("lat", airports$lat, sep = " "), 
+                         paste("lng", airports$lng, sep = " "), 
+                         sep = "<br/>")
+```
+
+***
+
+```{r, echo=FALSE, eval=TRUE, warning=FALSE, message=FALSE}
+leaflet(airports) %>%
+    addTiles() %>%
+    addMarkers(clusterOptions = markerClusterOptions(), 
+               icon = airplaneIcon,
+               popup = airports$legend)
+```
